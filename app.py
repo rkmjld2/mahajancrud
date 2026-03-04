@@ -4,9 +4,10 @@ import pandas as pd
 
 # ------------------ SECURE CONNECTION ------------------
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ssl_path = os.path.join(BASE_DIR, "isrgrootx1.pem")
 
+import os   # ✅ ADD THIS LINE
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def get_connection():
     return mysql.connector.connect(
         host=st.secrets["database"]["host"],
@@ -114,4 +115,5 @@ elif menu == "Search":
     keyword = st.text_input("Search keyword")
 
     if st.button("Search"):
+
         st.dataframe(search_record(keyword))
