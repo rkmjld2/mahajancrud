@@ -24,9 +24,8 @@ def get_connection():
         password=st.secrets["database"]["password"],
         database=st.secrets["database"]["database"],
         port=st.secrets["database"]["port"],
-        ssl_ca=ssl_path,
-        ssl_verify_cert=True,
-        use_pure=True                     # ← Add this
+        # Remove all ssl_* parameters
+        use_pure=True   # optional but recommended for pure-python behavior
     )
 # ------------------ CREATE ------------------
 
@@ -132,6 +131,7 @@ elif menu == "Search":
 
     if st.button("Search"):
         st.dataframe(search_record(keyword))
+
 
 
 
