@@ -1,13 +1,15 @@
 import streamlit as st
 import mysql.connector
 import pandas as pd
+import os
 
-# ------------------ SECURE CONNECTION ------------------
-
-
-import os   # ✅ ADD THIS LINE
+# ------------------ SSL FILE PATH ------------------
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ssl_path = os.path.join(BASE_DIR, "isrgrootx1.pem")
+
+# ------------------ DATABASE CONNECTION ------------------
+
 def get_connection():
     return mysql.connector.connect(
         host=st.secrets["database"]["host"],
@@ -20,14 +22,15 @@ def get_connection():
         ssl_verify_identity=True,
         tls_versions=["TLSv1.2", "TLSv1.3"]
     )
+
 # ------------------ CREATE ------------------
 
-def create_record(name, age, city):
+def create_record(name, age, address):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO patients (name, age, address) VALUES (%s, %s, %s)",
-        (name, age, city)
+        (name, age, address)
     )
     conn.commit()
     conn.close()
@@ -42,12 +45,12 @@ def read_records():
 
 # ------------------ UPDATE ------------------
 
-def update_record(id, name, age, city):
+def update_record(id, name, age, address):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "UPDATE students SET name=%s, age=%s, city=%s WHERE id=%s",
-        (name, age, city, id)
+        "UPDATE patients SET name=%s, age=%s, address=%s WHERE id=%s",
+        (name, age, address, id)
     )
     conn.commit()
     conn.close()
@@ -67,55 +70,60 @@ def search_record(keyword):
     conn = get_connection()
     query = """
         SELECT * FROM patients
-        WHERE name LIKE %s OR city LIKE %s
+        WHERE name LIKE %s OR address LIKE %s
     """
-    df = pd.read_sql(query, conn,
-                     params=(f"%{keyword}%", f"%{keyword}%"))
+    df = pd.read_sql(
+        query,
+        conn,
+        params=(f"%{keyword}%", f"%{keyword}%")
+    )
     conn.close()
     return df
 
 # ------------------ UI ------------------
 
-st.title("Medical App - Student CRUD")
+st.title("Medical App - Patient CRUD")
 
 menu = st.sidebar.selectbox(
     "Menu", ["Create", "Read", "Update", "Delete", "Search"]
 )
 
+# CREATE
 if menu == "Create":
     name = st.text_input("Name")
     age = st.number_input("Age", min_value=1)
-    city = st.text_input("address")
+    address = st.text_input("Address")
 
     if st.button("Save"):
         create_record(name, age, address)
-        st.success("Record Added")
+        st.success("Record Added Successfully")
 
+# READ
 elif menu == "Read":
     st.dataframe(read_records())
 
+# UPDATE
 elif menu == "Update":
     id = st.number_input("ID", min_value=1)
     name = st.text_input("New Name")
     age = st.number_input("New Age", min_value=1)
-    address = st.text_input("New address")
+    address = st.text_input("New Address")
 
     if st.button("Update"):
         update_record(id, name, age, address)
-        st.success("Record Updated")
+        st.success("Record Updated Successfully")
 
+# DELETE
 elif menu == "Delete":
     id = st.number_input("ID to Delete", min_value=1)
 
     if st.button("Delete"):
         delete_record(id)
-        st.success("Record Deleted")
+        st.success("Record Deleted Successfully")
 
+# SEARCH
 elif menu == "Search":
     keyword = st.text_input("Search keyword")
 
     if st.button("Search"):
-
         st.dataframe(search_record(keyword))
-
-
