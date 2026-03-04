@@ -1,9 +1,29 @@
 import streamlit as st
 import mysql.connector
 import pandas as pd
-import os
 from datetime import date
-st.subheader("Connection Debug (remove later)")
+
+# ────────────────────────────────────────────────
+# 1. DATABASE CONNECTION FUNCTION – MUST COME FIRST
+# ────────────────────────────────────────────────
+def get_connection():
+    try:
+        return mysql.connector.connect(
+            host=st.secrets["database"]["host"],
+            user=st.secrets["database"]["user"],
+            password=st.secrets["database"]["password"],
+            database=st.secrets["database"]["database"],
+            port=st.secrets["database"].get("port", 3306),
+            use_pure=True
+        )
+    except mysql.connector.Error as err:
+        st.error(f"Database connection failed: {err}")
+        return None
+
+# ────────────────────────────────────────────────
+# 2. DEBUG BLOCK – NOW SAFE TO CALL get_connection()
+# ────────────────────────────────────────────────
+st.subheader("Connection Debug (remove this section later)")
 
 try:
     conn = get_connection()
@@ -26,10 +46,26 @@ try:
             st.write(f"Rows in patients: **{count}**")
         else:
             st.error("Table 'patients' does NOT exist!")
+        
+        conn.close()   # ← important: close here
     else:
         st.error("Connection failed – check secrets.toml")
 except Exception as e:
     st.error(f"Debug error: {str(e)}")
+
+# ────────────────────────────────────────────────
+# Rest of your functions (create_record, read_records, etc.)
+# ────────────────────────────────────────────────
+
+def create_record(...):
+    ...
+
+# ... all other functions ...
+
+# Then the UI code
+st.title("Medical App – Patient Management")
+menu = st.sidebar.selectbox(...)
+# etc.
 # ────────────────────────────────────────────────
 # DATABASE CONNECTION
 # ────────────────────────────────────────────────
@@ -318,4 +354,5 @@ elif menu == "Search Patients":
             st.dataframe(df, use_container_width=True)
     else:
         st.info("Type something to search...")
+
 
