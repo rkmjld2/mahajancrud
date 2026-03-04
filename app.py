@@ -56,9 +56,28 @@ except Exception as e:
 # ────────────────────────────────────────────────
 # Rest of your functions (create_record, read_records, etc.)
 # ────────────────────────────────────────────────
-
-def create_record(...):
-    ...
+def create_record(patient_id, name, age, gender, phone, email, address, diagnosis, doctor_id, admission_date, status):
+    conn = get_connection()
+    if not conn:
+        return
+    try:
+        cursor = conn.cursor()
+        query = """
+        INSERT INTO patients 
+        (patient_id, name, age, gender, phone, email, address, diagnosis, doctor_id, admission_date, status)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = (
+            patient_id, name, age, gender, phone, email,
+            address, diagnosis, doctor_id, admission_date, status
+        )
+        cursor.execute(query, values)
+        conn.commit()
+        st.success("Patient added successfully!")
+    except Exception as e:
+        st.error(f"Insert failed: {e}")
+    finally:
+        conn.close()
 
 # ... all other functions ...
 
@@ -354,5 +373,6 @@ elif menu == "Search Patients":
             st.dataframe(df, use_container_width=True)
     else:
         st.info("Type something to search...")
+
 
 
