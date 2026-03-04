@@ -26,7 +26,7 @@ def create_record(name, age, city):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO students (name, age, city) VALUES (%s, %s, %s)",
+        "INSERT INTO patients (name, age, city) VALUES (%s, %s, %s)",
         (name, age, city)
     )
     conn.commit()
@@ -117,3 +117,4 @@ elif menu == "Search":
     if st.button("Search"):
 
         st.dataframe(search_record(keyword))
+
