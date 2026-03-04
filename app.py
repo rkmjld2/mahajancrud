@@ -26,9 +26,8 @@ def get_connection():
         port=st.secrets["database"]["port"],
         ssl_ca=ssl_path,
         ssl_verify_cert=True,
-        ssl_verify_identity=True
+        # ssl_verify_identity=True   ← REMOVE or comment this line
     )
-
 # ------------------ CREATE ------------------
 
 def create_record(name, age, address):
@@ -133,4 +132,5 @@ elif menu == "Search":
 
     if st.button("Search"):
         st.dataframe(search_record(keyword))
+
 
