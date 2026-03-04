@@ -10,6 +10,13 @@ ssl_path = os.path.join(BASE_DIR, "isrgrootx1.pem")
 
 # ------------------ DATABASE CONNECTION ------------------
 
+import streamlit as st
+import mysql.connector
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ssl_path = os.path.join(BASE_DIR, "isrgrootx1.pem")
+
 def get_connection():
     return mysql.connector.connect(
         host=st.secrets["database"]["host"],
@@ -19,8 +26,7 @@ def get_connection():
         port=st.secrets["database"]["port"],
         ssl_ca=ssl_path,
         ssl_verify_cert=True,
-        ssl_verify_identity=True,
-        tls_versions=["TLSv1.2", "TLSv1.3"]
+        ssl_verify_identity=True
     )
 
 # ------------------ CREATE ------------------
@@ -127,3 +133,4 @@ elif menu == "Search":
 
     if st.button("Search"):
         st.dataframe(search_record(keyword))
+
