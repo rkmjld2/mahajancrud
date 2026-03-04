@@ -127,24 +127,35 @@ def delete_record(id):
         conn.close()
 
 # ────────────────────────────────────────────────
-# SEARCH
+# SEARCH - FIXED VERSION
 # ────────────────────────────────────────────────
 def search_record(keyword):
     conn = get_connection()
     if not conn:
         return pd.DataFrame()
     try:
+        # Handle wildcard search like "search * from patients"
+        search_term = keyword.strip()
+        if search_term.lower() == "search * from patients" or search_term == "*":
+            # Return all records for wildcard search
+            return pd.read_sql("SELECT * FROM patients ORDER BY id DESC", conn)
+        
+        # Regular search across multiple fields
+        param = f"%{search_term}%"
         query = """
         SELECT * FROM patients
         WHERE patient_id LIKE %s
+           OR CAST(id AS CHAR) LIKE %s
            OR name LIKE %s
+           OR CAST(age AS CHAR) LIKE %s
+           OR gender LIKE %s
            OR phone LIKE %s
            OR email LIKE %s
            OR address LIKE %s
            OR diagnosis LIKE %s
+           OR CAST(doctor_id AS CHAR) LIKE %s
         """
-        param = f"%{keyword}%"
-        df = pd.read_sql(query, conn, params=(param, param, param, param, param, param))
+        df = pd.read_sql(query, conn, params=(param, param, param, param, param, param, param, param, param, param))
         return df
     except Exception as e:
         st.error(f"Search error: {e}")
