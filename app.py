@@ -2,7 +2,8 @@ import streamlit as st
 import mysql.connector
 import pandas as pd
 from datetime import date
-
+st.title("TEST – Is the app even starting?")
+st.write("If you see this → basic Streamlit works. Problem is later in code.")
 # ────────────────────────────────────────────────
 # 1. DATABASE CONNECTION FUNCTION – MUST COME FIRST
 # ────────────────────────────────────────────────
@@ -373,6 +374,7 @@ elif menu == "Search Patients":
             st.dataframe(df, use_container_width=True)
     else:
         st.info("Type something to search...")
+
 
 
 
