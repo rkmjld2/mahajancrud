@@ -3,7 +3,33 @@ import mysql.connector
 import pandas as pd
 import os
 from datetime import date
+st.subheader("Connection Debug (remove later)")
 
+try:
+    conn = get_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT DATABASE()")
+        db_name = cursor.fetchone()[0]
+        st.success(f"Connected to database: **{db_name}**")
+
+        cursor.execute("SHOW TABLES")
+        tables = [row[0] for row in cursor.fetchall()]
+        if tables:
+            st.write("Tables found:", ", ".join(tables))
+        else:
+            st.warning("No tables found in this database!")
+
+        if 'patients' in [t.lower() for t in tables]:
+            df = pd.read_sql("SELECT COUNT(*) AS cnt FROM patients", conn)
+            count = df['cnt'].iloc[0]
+            st.write(f"Rows in patients: **{count}**")
+        else:
+            st.error("Table 'patients' does NOT exist!")
+    else:
+        st.error("Connection failed – check secrets.toml")
+except Exception as e:
+    st.error(f"Debug error: {str(e)}")
 # ────────────────────────────────────────────────
 # DATABASE CONNECTION
 # ────────────────────────────────────────────────
@@ -292,3 +318,4 @@ elif menu == "Search Patients":
             st.dataframe(df, use_container_width=True)
     else:
         st.info("Type something to search...")
+
