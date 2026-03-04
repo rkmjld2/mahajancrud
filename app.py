@@ -26,7 +26,7 @@ def create_record(name, age, city):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO patients (name, age, city) VALUES (%s, %s, %s)",
+        "INSERT INTO patients (name, age, address) VALUES (%s, %s, %s)",
         (name, age, city)
     )
     conn.commit()
@@ -36,7 +36,7 @@ def create_record(name, age, city):
 
 def read_records():
     conn = get_connection()
-    df = pd.read_sql("SELECT * FROM students", conn)
+    df = pd.read_sql("SELECT * FROM patients", conn)
     conn.close()
     return df
 
@@ -57,7 +57,7 @@ def update_record(id, name, age, city):
 def delete_record(id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM students WHERE id=%s", (id,))
+    cursor.execute("DELETE FROM patients WHERE id=%s", (id,))
     conn.commit()
     conn.close()
 
@@ -66,7 +66,7 @@ def delete_record(id):
 def search_record(keyword):
     conn = get_connection()
     query = """
-        SELECT * FROM students
+        SELECT * FROM patients
         WHERE name LIKE %s OR city LIKE %s
     """
     df = pd.read_sql(query, conn,
@@ -85,10 +85,10 @@ menu = st.sidebar.selectbox(
 if menu == "Create":
     name = st.text_input("Name")
     age = st.number_input("Age", min_value=1)
-    city = st.text_input("City")
+    city = st.text_input("address")
 
     if st.button("Save"):
-        create_record(name, age, city)
+        create_record(name, age, address)
         st.success("Record Added")
 
 elif menu == "Read":
@@ -98,10 +98,10 @@ elif menu == "Update":
     id = st.number_input("ID", min_value=1)
     name = st.text_input("New Name")
     age = st.number_input("New Age", min_value=1)
-    city = st.text_input("New City")
+    address = st.text_input("New address")
 
     if st.button("Update"):
-        update_record(id, name, age, city)
+        update_record(id, name, age, address)
         st.success("Record Updated")
 
 elif menu == "Delete":
@@ -117,4 +117,5 @@ elif menu == "Search":
     if st.button("Search"):
 
         st.dataframe(search_record(keyword))
+
 
